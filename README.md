@@ -25,5 +25,5 @@ El sistema tiene como objetivo gestionar turnos en un consultorio médico, permi
 
 Nombre de la base de datos:
 
-''sql
+```sql
 gestion_turnos
