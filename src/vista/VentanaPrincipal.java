@@ -25,40 +25,39 @@ public class VentanaPrincipal extends JFrame {
 
     /**
      * Constructor de la ventana principal.
-     * Inicializa el sistema, configura la ventana y carga los componentes gráficos.
+     * Inicializa el sistema, configura la ventana y carga los componentes graficos
      */
     public VentanaPrincipal() {
         this.sistema = new SistemaTurnos();
 
-        // Configuración básica de la ventana principal.
+        // Configuración de la ventana principal
         setTitle("Sistema de Gestión de Turnos Médicos");
         setSize(500, 450);
-        setLocationRelativeTo(null); // Centra la ventana en la pantalla.
+        setLocationRelativeTo(null); // Centro ventana en la pantalla.
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         inicializarComponentes();
     }
 
     /**
-     * Método encargado de crear y organizar los componentes visuales
-     * de la ventana principal.
+     * Metodo encargado de crear y organizar los componentes visuales de la ventana principal.
      */
     private void inicializarComponentes() {
 
-        // Panel principal con BorderLayout para organizar título y botones.
+        // Panel principal con BorderLayout para organizar título y botones
         JPanel panelPrincipal = new JPanel();
         panelPrincipal.setLayout(new BorderLayout());
 
-        // Título superior de la aplicación.
+        // Título superior de la aplicación
         JLabel titulo = new JLabel("Sistema de Gestión de Turnos", SwingConstants.CENTER);
         titulo.setFont(new Font("Arial", Font.BOLD, 20));
 
-        // Panel donde se ubican los botones del menú principal.
+        // Panel donde se ubican los botones del menú principal
         JPanel panelBotones = new JPanel();
         panelBotones.setLayout(new GridLayout(8, 1, 10, 10));
         panelBotones.setBorder(BorderFactory.createEmptyBorder(20, 80, 20, 80));
 
-        // Creación de botones principales del sistema.
+        // Creación de botones del sistema
         JButton btnRegistrarPaciente = new JButton("Registrar paciente");
         JButton btnRegistrarMedico = new JButton("Registrar médico");
         JButton btnRegistrarEspecialidad = new JButton("Registrar especialidad");
@@ -68,7 +67,7 @@ public class VentanaPrincipal extends JFrame {
         JButton btnCancelarTurno = new JButton("Cancelar turno");
         JButton btnSalir = new JButton("Salir");
 
-        // Agregado de botones al panel del menú.
+        // Agregado de botones al panel del menu
         panelBotones.add(btnRegistrarPaciente);
         panelBotones.add(btnRegistrarMedico);
         panelBotones.add(btnRegistrarEspecialidad);
@@ -78,11 +77,11 @@ public class VentanaPrincipal extends JFrame {
         panelBotones.add(btnCancelarTurno);
         panelBotones.add(btnSalir);
 
-        // Agregado del título y el panel de botones al panel principal.
+        // Agregado del título y el panel de botones al panel principal
         panelPrincipal.add(titulo, BorderLayout.NORTH);
         panelPrincipal.add(panelBotones, BorderLayout.CENTER);
 
-        // Agregado del panel principal a la ventana.
+        // Agregado del panel principal a la ventana
         add(panelPrincipal);
 
         /*
@@ -94,31 +93,31 @@ public class VentanaPrincipal extends JFrame {
         // Abre el formulario para registrar un nuevo paciente.
         btnRegistrarPaciente.addActionListener(e -> mostrarFormularioPaciente());
 
-        // Abre el formulario para registrar un nuevo médico.
+        // Abre el formulario para registrar un nuevo médico
         btnRegistrarMedico.addActionListener(e -> mostrarFormularioMedico());
 
-        // Abre el formulario para registrar una nueva especialidad médica.
+        // Abre el formulario para registrar una nueva especialidad médica
         btnRegistrarEspecialidad.addActionListener(e -> mostrarFormularioEspecialidad());
 
-        // Abre el formulario para asignar un turno a un paciente con un médico.
+        // Abre el formulario para asignar un turno a un paciente con un médico
         btnAsignarTurno.addActionListener(e -> mostrarFormularioAsignarTurno());
 
-        // Muestra una tabla con todos los turnos registrados.
+        // Muestra una tabla con todos los turnos registrados
         btnConsultarTurnos.addActionListener(e -> mostrarListadoTurnos());
 
-        // Permite buscar turnos registrados a partir del DNI del paciente.
+        // Permite buscar turnos registrados a partir del DNI del paciente
         btnBuscarTurnosPorDni.addActionListener(e -> mostrarBusquedaTurnosPorDni());
 
-        // Permite cancelar un turno seleccionándolo desde una lista.
+        // Permite cancelar un turno seleccionándolo desde una lista
         btnCancelarTurno.addActionListener(e -> mostrarFormularioCancelarTurno());
 
-        // Cierra la aplicación.
+        // Cierra la aplicación
         btnSalir.addActionListener(e -> System.exit(0));
     }
 
     /**
-     * Muestra un formulario modal para registrar una especialidad médica.
-     * Este formulario permite cargar nombre y descripción de la especialidad.
+     * Muestra un formulario modal para registrar una especialidad médica
+     * Este formulario permite cargar nombre y descripción de la especialidad
      */
     private void mostrarFormularioEspecialidad() {
 
@@ -127,7 +126,7 @@ public class VentanaPrincipal extends JFrame {
         dialogo.setLocationRelativeTo(this);
         dialogo.setLayout(new BorderLayout());
 
-        // Panel del formulario con dos columnas: etiqueta y campo de texto.
+        // Panel del formulario con dos columnas: etiqueta y campo de texto
         JPanel panelFormulario = new JPanel(new GridLayout(2, 2, 10, 10));
         panelFormulario.setBorder(BorderFactory.createEmptyBorder(20, 20, 10, 20));
 
@@ -155,8 +154,7 @@ public class VentanaPrincipal extends JFrame {
 
         /*
          * Evento del botón Guardar.
-         * Toma los datos ingresados, llama a la lógica del sistema
-         * y maneja posibles errores mediante excepciones.
+         * Toma los datos ingresados, llama a la lógica del sistema y maneja posibles errores mediante excepciones
          */
         btnGuardar.addActionListener(e -> {
             try {
@@ -184,7 +182,7 @@ public class VentanaPrincipal extends JFrame {
             }
         });
 
-        // Cierra el formulario sin guardar datos.
+        // Cierra el formulario sin guardar los datos
         btnCancelar.addActionListener(e -> dialogo.dispose());
 
         dialogo.setVisible(true);
@@ -201,7 +199,7 @@ public class VentanaPrincipal extends JFrame {
         dialogo.setLocationRelativeTo(this);
         dialogo.setLayout(new BorderLayout());
 
-        // Panel del formulario con etiquetas y campos de entrada.
+        // Panel del formulario con etiquetas y campos de entrada
         JPanel panelFormulario = new JPanel(new GridLayout(5, 2, 10, 10));
         panelFormulario.setBorder(BorderFactory.createEmptyBorder(20, 20, 10, 20));
 
@@ -243,8 +241,7 @@ public class VentanaPrincipal extends JFrame {
 
         /*
          * Evento del botón Guardar.
-         * Convierte DNI y teléfono a enteros, llama a la lógica del sistema
-         * y muestra mensajes de éxito o error según corresponda.
+         * Convierte DNI y teléfono a enteros, y muestra mensajes de éxito o error según corresponda.
          */
         btnGuardar.addActionListener(e -> {
             try {
@@ -283,19 +280,19 @@ public class VentanaPrincipal extends JFrame {
             }
         });
 
-        // Cierra el formulario sin guardar datos.
+        // Cierra el formulario sin guardar los datos
         btnCancelar.addActionListener(e -> dialogo.dispose());
 
         dialogo.setVisible(true);
     }
 
     /**
-     * Muestra un formulario modal para registrar un médico.
-     * Para registrar un médico debe existir al menos una especialidad cargada.
+     * Muestra un formulario para registrar un médico
+     * Para registrar un médico debe existir al menos una especialidad cargada
      */
     private void mostrarFormularioMedico() {
 
-        // Validación previa: un médico debe estar asociado a una especialidad.
+        // Validación previa: un médico debe estar asociada a una especialidad
         if (sistema.getEspecialidades().isEmpty()) {
             JOptionPane.showMessageDialog(
                     this,
@@ -358,9 +355,8 @@ public class VentanaPrincipal extends JFrame {
         dialogo.add(panelBotones, BorderLayout.SOUTH);
 
         /*
-         * Evento del botón Guardar.
-         * Convierte DNI y teléfono a enteros, obtiene la especialidad seleccionada
-         * y llama al método registrarMedico de la lógica del sistema.
+         * Evento del botón Guardar
+         * Convierte DNI y teléfono a enteros, obtiene la especialidad seleccionada y llama al método registrarMedico
          */
         btnGuardar.addActionListener(e -> {
             try {
@@ -409,15 +405,15 @@ public class VentanaPrincipal extends JFrame {
             }
         });
 
-        // Cierra el formulario sin guardar datos.
+        // Cierra el formulario sin guardar datos
         btnCancelar.addActionListener(e -> dialogo.dispose());
 
         dialogo.setVisible(true);
     }
 
     /**
-     * Muestra un formulario modal para asignar un turno médico.
-     * El turno requiere seleccionar paciente, médico, fecha, hora y una observación opcional.
+     * Muestra un formulario para asignar un turno médico
+     * El turno requiere seleccionar paciente, médico, fecha, hora y una observación opcional
      */
     private void mostrarFormularioAsignarTurno() {
 
@@ -447,7 +443,7 @@ public class VentanaPrincipal extends JFrame {
         dialogo.setLocationRelativeTo(this);
         dialogo.setLayout(new BorderLayout());
 
-        // Panel del formulario.
+        // Panel del formulario
         JPanel panelFormulario = new JPanel(new GridLayout(5, 2, 10, 10));
         panelFormulario.setBorder(BorderFactory.createEmptyBorder(20, 20, 10, 20));
 
@@ -490,9 +486,8 @@ public class VentanaPrincipal extends JFrame {
         dialogo.add(panelBotones, BorderLayout.SOUTH);
 
         /*
-         * Evento del botón Guardar.
-         * Convierte fecha y hora al formato correspondiente, verifica disponibilidad
-         * y registra el turno si no existe superposición.
+         * Evento del botón Guardar
+         * Convierte fecha y hora al formato correspondiente, verifica disponibilidad y registra el turno si no existe superposición.
          */
         btnGuardar.addActionListener(e -> {
             try {
@@ -542,15 +537,15 @@ public class VentanaPrincipal extends JFrame {
             }
         });
 
-        // Cierra el formulario sin guardar datos.
+        // Cierra el formulario sin guardar datos
         btnCancelar.addActionListener(e -> dialogo.dispose());
 
         dialogo.setVisible(true);
     }
 
     /**
-     * Muestra una ventana con el listado completo de turnos registrados.
-     * Antes de mostrar la información, ordena los turnos por fecha y hora.
+     * Muestra una ventana con el listado completo de turnos registrados
+     * Antes de mostrar la información, ordena los turnos por fecha y hora
      */
     private void mostrarListadoTurnos() {
 
@@ -564,7 +559,7 @@ public class VentanaPrincipal extends JFrame {
             return;
         }
 
-        // Ordena los turnos por fecha y hora antes de mostrarlos.
+        // Ordena turnos por fecha y hora antes de mostrarlos
         sistema.ordenarTurnosPorFechaYHora();
 
         mostrarTablaTurnos(sistema.getTurnos(), "Consultar turnos");
@@ -572,8 +567,7 @@ public class VentanaPrincipal extends JFrame {
 
     /**
      * Muestra una lista de turnos en una tabla.
-     * Este método permite reutilizar la visualización tanto para consultar todos los turnos
-     * como para mostrar resultados de búsqueda.
+     * Este metodo permite reutilizar la visualización tanto para consultar todos los turnos como para mostrar resultados de búsqueda.
      */
     private void mostrarTablaTurnos(ArrayList<Turno> listaTurnos, String tituloVentana) {
 
@@ -593,8 +587,8 @@ public class VentanaPrincipal extends JFrame {
         };
 
         /*
-         * DefaultTableModel permite cargar datos en una JTable.
-         * Se sobrescribe isCellEditable para evitar que el usuario edite la tabla directamente.
+         * DefaultTableModel permite cargar datos en una JTable (filas y col.)
+         * Se sobrescribe isCellEditable para evitar que el usuario edite la tabla directamente
          */
         DefaultTableModel modeloTabla = new DefaultTableModel(columnas, 0) {
             @Override
@@ -603,7 +597,7 @@ public class VentanaPrincipal extends JFrame {
             }
         };
 
-        // Recorre la lista recibida y agrega cada turno como una fila de la tabla.
+        // Recorro lista recibida y agrega cada turno como una fila de la tabla.
         for (Turno turno : listaTurnos) {
             Object[] fila = {
                     turno.getIdTurno(),
@@ -634,8 +628,8 @@ public class VentanaPrincipal extends JFrame {
     }
 
     /**
-     * Permite buscar turnos asociados a un paciente mediante su DNI.
-     * El resultado se muestra en una tabla, reutilizando la lista de turnos del sistema.
+     * Permite buscar turnos asociados a un paciente mediante su DNI
+     * El resultado se muestra en una tabla, reutilizando la lista de turnos del sistema
      */
     private void mostrarBusquedaTurnosPorDni() {
 
@@ -656,7 +650,7 @@ public class VentanaPrincipal extends JFrame {
                 JOptionPane.QUESTION_MESSAGE
         );
 
-        // Si el usuario cancela o cierra la ventana, no se realiza ninguna acción.
+        // Si el usuario cancela o cierra la ventana, no se realiza ninguna acción
         if (dniIngresado == null) {
             return;
         }
@@ -665,9 +659,8 @@ public class VentanaPrincipal extends JFrame {
             int dni = Integer.parseInt(dniIngresado.trim());
 
             /*
-             * Se llama al método de búsqueda definido en SistemaTurnos.
-             * Este método recorre la lista de turnos y devuelve aquellos
-             * que correspondan al DNI ingresado.
+             * Se llama al metodo de búsqueda definido en SistemaTurnos.
+             * Este metodo recorre la lista de turnos y devuelve aquellos que correspondan al DNI ingresado.
              */
             ArrayList<Turno> turnosEncontrados = sistema.buscarTurnosPorDniPaciente(dni);
 
@@ -694,8 +687,8 @@ public class VentanaPrincipal extends JFrame {
     }
 
     /**
-     * Permite cancelar un turno registrado seleccionándolo desde una lista desplegable.
-     * Se muestran únicamente los turnos activos, evitando cancelar nuevamente turnos ya cancelados.
+     * Permite cancelar un turno registrado seleccionándolo desde una lista desplegable
+     * Se muestran únicamente los turnos activos, evitando cancelar nuevamente turnos ya cancelados
      */
     private void mostrarFormularioCancelarTurno() {
 
@@ -709,7 +702,7 @@ public class VentanaPrincipal extends JFrame {
             return;
         }
 
-        // ComboBox que contendrá únicamente los turnos que no estén cancelados.
+        // ComboBox que contiene únicamente los turnos que NO estén cancelados
         JComboBox<Turno> comboTurnos = new JComboBox<>();
 
         for (Turno turno : sistema.getTurnos()) {
