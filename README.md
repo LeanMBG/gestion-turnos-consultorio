@@ -33,17 +33,63 @@ El desarrollo fue realizado en Java aplicando conceptos de Programación Orienta
 
 ## Estructura del repositorio
 
-```text
-gestion-turnos-consultorio/
-├── src/
-│   ├── excepciones/
-│   ├── modelo/
-│   ├── principal/
-│   ├── servicio/
-│   └── vista/
-│
-├── sql/
-│   └── scripts SQL de base de datos
-│
-├── .gitignore
-└── README.md
+- src
+  - excepciones
+  - modelo
+  - principal
+  - servicio
+  - vista
+
+- sql
+  - scripts SQL de base de datos
+
+- .gitignore
+- README.md
+
+## Paquetes Java
+
+- modelo: contiene las clases principales del dominio del sistema.
+- servicio: contiene la lógica principal del sistema.
+- vista: contiene la interfaz gráfica desarrollada con Swing.
+- excepciones: contiene las excepciones personalizadas.
+- principal: contiene la clase Main, encargada de iniciar la aplicación.
+
+## Ejecución del prototipo
+
+Para ejecutar el proyecto:
+
+1. Abrir el proyecto en IntelliJ IDEA.
+2. Verificar que el JDK configurado sea Java 21.
+3. Ejecutar la clase principal.Main.
+
+## Base de datos
+
+La carpeta sql contiene los scripts trabajados para la base de datos MySQL, incluyendo creación de tablas, inserción de datos de prueba y consultas SQL.
+
+En esta etapa, el prototipo Java utiliza listas ArrayList para almacenar los datos durante la ejecución. La conexión completa con MySQL mediante JDBC queda prevista como mejora futura.
+
+## Organización del código
+
+El código se encuentra organizado en paquetes para separar responsabilidades:
+
+- Las clases del dominio se encuentran en modelo.
+- La lógica principal se encuentra en servicio.
+- La interfaz gráfica se encuentra en vista.
+- Las excepciones personalizadas se encuentran en excepciones.
+- El inicio de la aplicación se encuentra en principal.
+
+## Mejoras futuras
+
+Algunas mejoras previstas para próximos incrementos son:
+
+- Conexión completa con MySQL mediante JDBC.
+- Persistencia permanente de datos.
+- Login de usuario administrativo.
+- Edición de pacientes, médicos y turnos.
+- Filtros por médico, fecha, especialidad o estado del turno.
+- Mejoras visuales en la interfaz gráfica.
+- Selector visual de fechas.
+
+## Autor
+
+Leandro M. Barbera
