@@ -127,8 +127,8 @@ public class Turno {
     }
 
     /**
-     * Devuelve una representación en texto del turno.
-     * Este método se utiliza, por ejemplo, para mostrar turnos en listas o ComboBox.
+     * Devuelve una representación en formato tipo texto del turno.
+     * Este metodo se utiliza, por ejemplo, para mostrar los turnos en listas o en ComboBox.
      */
     @Override
     public String toString() {
