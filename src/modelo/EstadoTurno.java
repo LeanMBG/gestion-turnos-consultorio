@@ -38,7 +38,6 @@ public class EstadoTurno {
 
     /**
      * Devuelve el estado como texto.
-     * Este método permite mostrar correctamente el estado en listas, tablas o ComboBox.
      */
     @Override
     public String toString() {
