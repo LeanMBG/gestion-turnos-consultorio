@@ -4,26 +4,43 @@ Proyecto desarrollado para la asignatura Seminario de Práctica Informática.
 
 ## Descripción
 
-El sistema tiene como objetivo gestionar turnos en un consultorio médico, permitiendo administrar pacientes, médicos, especialidades, usuarios administrativos, estados de turnos y turnos asignados.
+Prototipo de aplicación de escritorio para la gestión de turnos en un consultorio médico.
+
+El sistema permite registrar especialidades, pacientes y médicos, asignar turnos, consultar turnos registrados, buscar turnos por DNI del paciente y cancelar turnos activos.
 
 ## Tecnologías utilizadas
 
-- Java
+- Java 21
 - Swing
-- JDBC
+- IntelliJ IDEA
 - MySQL
+- SQL
 
-## Estructura del repositorio
+## Funcionalidades implementadas
 
-- `sql/01_creacion_base_datos.sql`: script para crear la base de datos.
-- `sql/02_creacion_tablas.sql`: script para crear las tablas.
-- `sql/03_insercion_datos_prueba.sql`: script con datos de prueba.
-- `sql/04_consultas_crud.sql`: consultas SQL de inserción, consulta, actualización y eliminación.
-- `src/`: código fuente Java del prototipo.
+- Registro de especialidades médicas.
+- Registro de pacientes.
+- Registro de médicos asociados a especialidades.
+- Asignación de turnos.
+- Validación de disponibilidad médica.
+- Validación de fechas anteriores a la actual.
+- Consulta de turnos en tabla.
+- Búsqueda de turnos por DNI del paciente.
+- Cancelación de turnos activos.
+- Manejo de excepciones personalizadas.
 
-## Base de datos
+## Estructura del proyecto
 
-Nombre de la base de datos:
+```text
+src/
+├── excepciones/
+├── modelo/
+├── principal/
+├── servicio/
+└── vista/
 
-```sql
-gestion_turnos
+sql/
+└── scripts de base de datos MySQL
+
+docs/
+└── documentación del trabajo práctico
