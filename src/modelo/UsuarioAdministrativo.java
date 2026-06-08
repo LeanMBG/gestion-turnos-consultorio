@@ -2,8 +2,7 @@ package modelo;
 
 /**
  * Clase que representa al usuario administrativo del sistema.
- * Este usuario es quien gestiona las operaciones principales del prototipo,
- * como registrar pacientes, médicos, especialidades y turnos.
+ * Este usuario es quien gestiona las operaciones principales del prototipo, como registrar pacientes, médicos, especialidades y turnos.
  */
 public class UsuarioAdministrativo {
 
@@ -72,23 +71,22 @@ public class UsuarioAdministrativo {
     }
 
     /**
-     * Valida si el usuario y la clave ingresados coinciden
-     * con los datos almacenados en el objeto.
+     * Valida si el usuario y la clave ingresados coinciden con los datos almacenados en el objeto.
      */
     public boolean iniciarSesion(String usuarioIngresado, String claveIngresada) {
         return this.usuario.equals(usuarioIngresado) && this.clave.equals(claveIngresada);
     }
 
     /**
-     * Método simple para representar el cierre de sesión.
-     * En este prototipo solo muestra un mensaje por consola.
+     * Metodo simple para representar el cierre de sesión.
+     * En este prototipo solo muestra el mensaje por consola.
      */
     public void cerrarSesion() {
         System.out.println("Sesión finalizada.");
     }
 
     /**
-     * Devuelve una representación textual del usuario.
+     * Devuelve una representación del usuario en formato tipo texto.
      */
     @Override
     public String toString() {
