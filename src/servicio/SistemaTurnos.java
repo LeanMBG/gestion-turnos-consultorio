@@ -221,7 +221,7 @@ public class SistemaTurnos {
     }
 
     /**
-     * Cancela un turno existente a partir del ID. No elimina el turno, cambia el estado a "Cancelado"
+     * Cancela un turno existente a partir del ID, no elimina el turno, cambia el estado a "Cancelado"
      */
     public void cancelarTurno(int idTurno) throws RegistroNoEncontradoException {
 
