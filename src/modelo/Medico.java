@@ -12,8 +12,7 @@ public class Medico extends Persona {
 
     /**
      * Constructor de la clase Medico.
-     * Utiliza super() para inicializar los atributos heredados de Persona
-     * y luego inicializa matrícula y especialidad.
+     * Utiliza super() para inicializar los atributos heredados de Persona y luego inicializa matrícula y especialidad.
      */
     public Medico(int id, String nombre, String apellido, int dni, int telefono, String matricula, Especialidad especialidad) {
         super(id, nombre, apellido, dni, telefono);
@@ -41,8 +40,7 @@ public class Medico extends Persona {
 
     /**
      * Implementación del método abstracto definido en Persona.
-     * Permite aplicar polimorfismo, ya que Medico devuelve
-     * una descripción propia distinta a la de Paciente.
+     * Permite aplicar polimorfismo, ya que Medico devuelve una descripción propia distinta a la de Paciente.
      */
     @Override
     public String obtenerDescripcion() {
@@ -50,8 +48,8 @@ public class Medico extends Persona {
     }
 
     /**
-     * Devuelve una representación textual del médico.
-     * Se utiliza para mostrar médicos en listas o ComboBox.
+     * Devuelve una representación tipo texto del médico.
+     * Se utiliza para mostrar médicos en listas o en el ComboBox
      */
     @Override
     public String toString() {
