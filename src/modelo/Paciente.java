@@ -18,7 +18,7 @@ public class Paciente extends Persona {
         this.email = email;
     }
 
-    // Getter y setter del atributo email
+    //  Permiten obtener y actualizar el correo electrónico asociado al paciente
     public String getEmail() {
         return email;
     }
@@ -38,7 +38,7 @@ public class Paciente extends Persona {
 
     /**
      * Devuelve el nombre completo del paciente.
-     * Este metodo se utiliza para mostrar pacientes en listas o ComboBox.
+     * Este metodo se utiliza para mostrar pacientes en las listas o el ComboBox.
      */
     @Override
     public String toString() {
