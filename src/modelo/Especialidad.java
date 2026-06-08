@@ -1,8 +1,8 @@
 package modelo;
 
 /**
- * Clase que representa una especialidad médica dentro del sistema.
- * Una especialidad puede estar asociada a uno o varios médicos.
+ * Clase que representa una especialidad médica dentro del sistema
+ * Una especialidad puede estar asociada a uno o varios médicos
  */
 public class Especialidad {
 
@@ -12,7 +12,7 @@ public class Especialidad {
     private String descripcion;
 
     /**
-     * Constructor de la clase Especialidad.
+     * Constructor de la clase Especialidad
      * Permite inicializar una especialidad con su identificador, nombre y descripción.
      */
     public Especialidad(int idEspecialidad, String nombre, String descripcion) {
@@ -21,7 +21,7 @@ public class Especialidad {
         this.descripcion = descripcion;
     }
 
-    // Métodos getter y setter para acceder y modificar los atributos privados.
+    // Métodos getter y setter para acceder y modificar los atributos privados
     public int getIdEspecialidad() {
         return idEspecialidad;
     }
@@ -47,8 +47,7 @@ public class Especialidad {
     }
 
     /**
-     * Devuelve el nombre de la especialidad como representación textual.
-     * Este método permite mostrar correctamente la especialidad en componentes como JComboBox.
+     * Devuelve el nombre de la especialidad como texto
      */
     @Override
     public String toString() {
