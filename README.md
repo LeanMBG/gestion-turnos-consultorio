@@ -4,9 +4,11 @@ Proyecto desarrollado para la asignatura Seminario de Práctica Informática.
 
 ## Descripción
 
-Prototipo de aplicación de escritorio para la gestión de turnos en un consultorio médico.
+Este proyecto consiste en un prototipo de aplicación de escritorio para la gestión de turnos en un consultorio médico.
 
-El sistema permite registrar especialidades, pacientes y médicos, asignar turnos, consultar turnos registrados, buscar turnos por DNI del paciente y cancelar turnos activos.
+El sistema permite administrar especialidades médicas, pacientes, médicos y turnos. Además, permite asignar turnos, consultar los turnos registrados, buscar turnos por DNI del paciente y cancelar turnos activos.
+
+El desarrollo fue realizado en Java aplicando conceptos de Programación Orientada a Objetos, como encapsulamiento, herencia, polimorfismo y abstracción.
 
 ## Tecnologías utilizadas
 
@@ -20,27 +22,28 @@ El sistema permite registrar especialidades, pacientes y médicos, asignar turno
 
 - Registro de especialidades médicas.
 - Registro de pacientes.
-- Registro de médicos asociados a especialidades.
+- Registro de médicos asociados a una especialidad.
 - Asignación de turnos.
 - Validación de disponibilidad médica.
-- Validación de fechas anteriores a la actual.
-- Consulta de turnos en tabla.
+- Validación para evitar fechas anteriores a la fecha actual.
+- Consulta de turnos registrados en tabla.
 - Búsqueda de turnos por DNI del paciente.
 - Cancelación de turnos activos.
 - Manejo de excepciones personalizadas.
 
-## Estructura del proyecto
+## Estructura del repositorio
 
 ```text
-src/
-├── excepciones/
-├── modelo/
-├── principal/
-├── servicio/
-└── vista/
-
-sql/
-└── scripts de base de datos MySQL
-
-docs/
-└── documentación del trabajo práctico
+gestion-turnos-consultorio/
+├── src/
+│   ├── excepciones/
+│   ├── modelo/
+│   ├── principal/
+│   ├── servicio/
+│   └── vista/
+│
+├── sql/
+│   └── scripts SQL de base de datos
+│
+├── .gitignore
+└── README.md
