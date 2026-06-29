@@ -37,7 +37,7 @@ public class Paciente extends Persona {
     }
 
     /**
-     * Devuelve el nombre completo del paciente.
+     * Devuelve el nombre completo del pacient en formato tipo Texto
      * Este metodo se utiliza para mostrar pacientes en las listas o el ComboBox.
      */
     @Override

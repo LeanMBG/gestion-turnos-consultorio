@@ -39,8 +39,8 @@ public class Medico extends Persona {
     }
 
     /**
-     * Implementación del método abstracto definido en Persona.
-     * Permite aplicar polimorfismo, ya que Medico devuelve una descripción propia distinta a la de Paciente.
+     * Implementación del método abstracto definido en Persona
+     * Esto permite aplicar polimorfismo, ya que Medico devuelve una descripción propia distinta a la de Paciente.
      */
     @Override
     public String obtenerDescripcion() {
@@ -48,7 +48,7 @@ public class Medico extends Persona {
     }
 
     /**
-     * Devuelve una representación tipo texto del médico.
+     * Devuelvo variable de tipo texto del médico
      * Se utiliza para mostrar médicos en listas o en el ComboBox
      */
     @Override

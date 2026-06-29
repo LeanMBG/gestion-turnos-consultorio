@@ -79,14 +79,14 @@ public class UsuarioAdministrativo {
 
     /**
      * Metodo simple para representar el cierre de sesión.
-     * En este prototipo solo muestra el mensaje por consola.
+     * Solo muestra el mensaje por consola.
      */
     public void cerrarSesion() {
         System.out.println("Sesión finalizada.");
     }
 
     /**
-     * Devuelve una representación del usuario en formato tipo texto.
+     * Devuelvo el nombre en formato tipo texto
      */
     @Override
     public String toString() {

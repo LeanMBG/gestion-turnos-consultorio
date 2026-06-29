@@ -11,14 +11,18 @@ import java.util.ArrayList;
 import java.util.Comparator;
 
 /**
- * Clase de servicio contiene la lógica principal del sistema de turnos
- * Administra pacientes, médicos, especialidades, turnos, estados y usuarios administrativos
+ * Clase de servicio utilizada en el prototipo inicial del sistema
+ *
+ * En esta clase se administra la información en memoria mediante listas ArrayList.
+ * Permite registrar pacientes, médicos, especialidades y turnos sin conectarse directamente a la base de datos.
+ *
+ * En el incremento actual del proyecto, la persistencia real se realiza mediante las clases DAO y la conexión con MySQL.
  */
 public class SistemaTurnos {
 
     /*
-     * Estructuras de datos usadas para almacenar temporalmente la información.
-     * En una etapa posterior, estos datos podrían persistirse en MySQL...
+     * Listas utilizadas para almacenar temporalmente los datos durante la ejecución.
+     * Esta estructura fue útil para el primer prototipo, antes de incorporar MySQL.
      */
     private ArrayList<Paciente> pacientes;
     private ArrayList<Medico> medicos;
@@ -28,8 +32,8 @@ public class SistemaTurnos {
     private ArrayList<UsuarioAdministrativo> usuarios;
 
     /*
-     * Contadores usados para generar identificadores internos.
-     * Simulan comportamiento de claves autoincrementales de una BD
+     * Contadores internos para generar identificadores dentro del prototipo en memoria.
+     * Funcionan de manera similar a un AUTO_INCREMENT, pero solo mientras se ejecuta la aplicación.
      */
     private int contadorPacientes;
     private int contadorMedicos;
@@ -38,8 +42,8 @@ public class SistemaTurnos {
     private int contadorUsuarios;
 
     /**
-     * Constructor del sistema
-     * Inicializa las listas, los contadores y carga datos básicos necesarios, como los estados iniciales de los turnos y un usuario administrativo.
+     * Constructor del sistema.
+     * Inicializa las listas, los contadores y carga datos básicos para poder trabajarlos
      */
     public SistemaTurnos() {
         this.pacientes = new ArrayList<>();
@@ -60,7 +64,7 @@ public class SistemaTurnos {
     }
 
     /**
-     * Carga los estados iniciales que puede tener un turno
+     * Carga los estados básicos que puede tener un turno
      */
     private void cargarEstadosIniciales() {
         estadosTurno.add(new EstadoTurno(1, "Reservado"));
@@ -69,7 +73,7 @@ public class SistemaTurnos {
     }
 
     /**
-     * Carga un usuario administrativo inicial para operar el sistema.
+     * Carga un usuario administrativo inicial para operar el prototipo
      */
     private void cargarUsuarioInicial() {
         usuarios.add(new UsuarioAdministrativo(
@@ -82,7 +86,8 @@ public class SistemaTurnos {
     }
 
     /**
-     * Registra un nuevo paciente y valida datos obligatorios
+     * Registro de paciente nuevo en la lista de pacientes
+     * Antes de guardarlo, valida que los datos obligatorios estén completos
      */
     public Paciente registrarPaciente(String nombre, String apellido, int dni, int telefono, String email)
             throws DatoInvalidoException {
@@ -101,7 +106,7 @@ public class SistemaTurnos {
     }
 
     /**
-     * Registra una nueva especialidad médica
+     * Registro de nueva especialidad médica en la lista de especialidades
      */
     public Especialidad registrarEspecialidad(String nombre, String descripcion)
             throws DatoInvalidoException {
@@ -115,7 +120,7 @@ public class SistemaTurnos {
     }
 
     /**
-     * Registra un nuevo médico asociado a una especialidad existente
+     * Registro de un médico nuevo y lo asocia a una especialidad existente
      */
     public Medico registrarMedico(String nombre, String apellido, int dni, int telefono,
                                   String matricula, Especialidad especialidad)
@@ -145,8 +150,8 @@ public class SistemaTurnos {
     }
 
     /**
-     * Asigna un turno a un paciente con un médico en una fecha y hora determinadas
-     * Antes de registrar el turno, valida datos obligatorios, fecha, disponibilidad
+     * Asigno un turno a un paciente con un médico en una fecha y hora determinadas
+     * Antes de registrar el turno, valida los datos recibidos y verifica la disponibilidad
      */
     public Turno asignarTurno(Paciente paciente, Medico medico, LocalDate fecha, LocalTime hora,
                               String observacion, UsuarioAdministrativo usuario)
@@ -164,7 +169,7 @@ public class SistemaTurnos {
             throw new DatoInvalidoException("Debe seleccionar una fecha.");
         }
 
-        // no se permiten turnos con fechas anteriores al día actual.
+        // No se permiten turnos con fechas anteriores al día actual.
         if (fecha.isBefore(LocalDate.now())) {
             throw new DatoInvalidoException("No se pueden asignar turnos con fechas anteriores a la fecha actual.");
         }
@@ -177,7 +182,7 @@ public class SistemaTurnos {
             throw new DatoInvalidoException("Debe existir un usuario administrativo.");
         }
 
-        // Verifica que el médico no tenga otro turno activo en la misma fecha y hora.
+        // Se verifica que el médico no tenga otro turno activo en el mismo día y horario. Eivta superposicion.
         if (!verificarDisponibilidad(medico, fecha, hora)) {
             throw new TurnoNoDisponibleException("El médico no tiene disponibilidad en la fecha y hora seleccionadas.");
         }
@@ -201,8 +206,8 @@ public class SistemaTurnos {
     }
 
     /**
-     * Verifica si un médico está disponible en una fecha y hora determinada
-     * Si existe un turno no cancelado para ese médico en ese horario, devuelve un false y no permite asignarlo.
+     * Verifico si un médico está disponible para una fecha y hora determinadas
+     * Si existe un turno no cancelado para ese médico, devuelve false y no será almacenado un nuevo turno
      */
     public boolean verificarDisponibilidad(Medico medico, LocalDate fecha, LocalTime hora) {
 
@@ -221,7 +226,8 @@ public class SistemaTurnos {
     }
 
     /**
-     * Cancela un turno existente a partir del ID, no elimina el turno, cambia el estado a "Cancelado"
+     * Cancela un turno existente.
+     * El turno no se elimina, solo cambia su estado a "Cancelado"
      */
     public void cancelarTurno(int idTurno) throws RegistroNoEncontradoException {
 
@@ -235,7 +241,7 @@ public class SistemaTurnos {
     }
 
     /**
-     * Busca un turno por su identificador
+     * Busco un turno por su identificador
      */
     public Turno buscarTurnoPorId(int idTurno) {
 
@@ -249,8 +255,8 @@ public class SistemaTurnos {
     }
 
     /**
-     * Busca todos los turnos asociados a un paciente según su DNI.
-     * Recorre la lista de turnos y devuelve aquellos que coinciden con el DNI
+     * Busco todos los turnos asociados a un paciente según su DNI
+     * Recorre la lista de turnos, y devuelve todas las coincidencias encontradas
      */
     public ArrayList<Turno> buscarTurnosPorDniPaciente(int dni) {
 
@@ -266,7 +272,7 @@ public class SistemaTurnos {
     }
 
     /**
-     * Ordena los turnos por fecha y hora. Aplica algoritmo de ordenamiento usando Comparator.
+     * Ordena los turnos por fecha y hora. Se utiliza Comparator para organizar la lista de turnos
      */
     public void ordenarTurnosPorFechaYHora() {
         turnos.sort(
@@ -276,7 +282,7 @@ public class SistemaTurnos {
     }
 
     /**
-     * Busca un estado de turno por la descripción
+     * Busca un estado de turno por su descripción
      */
     private EstadoTurno obtenerEstadoPorNombre(String estadoBuscado) {
 
@@ -290,7 +296,7 @@ public class SistemaTurnos {
     }
 
     /**
-     * Validación de texto obligatorio no sea nulo ni vacío.
+     * Valido que un texto obligatorio no esté vacío
      */
     private void validarTexto(String texto, String mensajeError) throws DatoInvalidoException {
 
@@ -300,8 +306,8 @@ public class SistemaTurnos {
     }
 
     /*
-     * Métodos getter.
-     * Estos me permiten consultar las listas desde la interfaz sin exponer directamente la modificación interna de la lógica del sistema.
+     * Métodos getter
+     * Permiten consultar las listas desde otras partes del sistema
      */
 
     public ArrayList<Paciente> getPacientes() {
@@ -329,8 +335,8 @@ public class SistemaTurnos {
     }
 
     /**
-     * Devuelve el primer usuario administrativo disponible
-     * En este prototipo se utiliza un usuario inicial cargado automáticamente...
+     * Devuelve el primer usuario administrativo disponible.
+     * En este prototipo se utiliza un usuario inicial cargado automáticamente
      */
     public UsuarioAdministrativo getUsuarioAdministrador() {
         if (usuarios.isEmpty()) {

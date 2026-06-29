@@ -13,7 +13,7 @@ public class Especialidad {
 
     /**
      * Constructor de la clase Especialidad
-     * Permite inicializar una especialidad con su identificador, nombre y descripción.
+     * Permite inicializar la especialidad con su identificador, nombre y descripción.
      */
     public Especialidad(int idEspecialidad, String nombre, String descripcion) {
         this.idEspecialidad = idEspecialidad;

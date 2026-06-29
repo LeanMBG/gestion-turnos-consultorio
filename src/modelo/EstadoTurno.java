@@ -1,7 +1,7 @@
 package modelo;
 
 /**
- * Clase que representa el estado de un turno dentro del sistema.
+ * Clase que representa el estado de un turno dentro del sistema
  * Ejemplos de estados posibles: Reservado, Cancelado o Atendido.
  */
 public class EstadoTurno {

@@ -1,610 +1,793 @@
 package vista;
 
+import controlador.TurnoController;
 import excepciones.DatoInvalidoException;
-import excepciones.RegistroNoEncontradoException;
 import excepciones.TurnoNoDisponibleException;
+import modelo.Especialidad;
+import modelo.Medico;
+import modelo.Paciente;
 import modelo.Turno;
-import servicio.SistemaTurnos;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 
 /**
- * Ventana principal del sistema de gestión de turnos médicos.
- * Esta clase representa la pantalla inicial de la aplicación.
+ * Ventana principal del sistema de gestión de turnos médicos
+ *
+ * Esta clase representa la Vista dentro del patrón MVC solicitado por la cátedra..
+ * Permite al usuario interactuar con el sistema mediante una interfaz gráfica Swing.
+ * Las acciones realizadas desde esta ventana se comunican con TurnoController,
+ * que actúa como intermediario entre la vista, la lógica del sistema y la base de datos MySQL.
  */
 public class VentanaPrincipal extends JFrame {
 
-    // Objeto principal que contiene la lógica del sistema.
-    private SistemaTurnos sistema;
+    private TurnoController controller;
+
+    // Al iniciar la aplicación se usa la fecha actual como fecha sugerida.
+    private LocalDate fechaSugerida = LocalDate.now();
+
+    /*
+     * Al iniciar la aplicación se usa la hora actual como hora sugerida.
+     * Se eliminan segundos y nanosegundos para que el formato sea compatible con HH:MM.
+     */
+    private LocalTime horaSugerida = LocalTime.now().withSecond(0).withNano(0);
 
     /**
      * Constructor de la ventana principal.
-     * Inicializa el sistema, configura la ventana y carga los componentes graficos
+     * Inicializo el controlador y construyo la interfaz gráfica.
      */
     public VentanaPrincipal() {
-        this.sistema = new SistemaTurnos();
+        controller = new TurnoController();
 
-        // Configuración de la ventana principal
-        setTitle("Sistema de Gestión de Turnos Médicos");
-        setSize(500, 450);
-        setLocationRelativeTo(null); // Centro ventana en la pantalla.
+        setTitle("Sistema de gestión de turnos médicos");
+        setSize(600, 500);
+        setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         inicializarComponentes();
     }
 
     /**
-     * Metodo encargado de crear y organizar los componentes visuales de la ventana principal.
+     * Inicializo los componentes principales de la ventana.
      */
     private void inicializarComponentes() {
-
-        // Panel principal con BorderLayout para organizar título y botones
         JPanel panelPrincipal = new JPanel();
-        panelPrincipal.setLayout(new BorderLayout());
+        panelPrincipal.setLayout(new GridLayout(9, 1, 10, 10));
+        panelPrincipal.setBorder(BorderFactory.createEmptyBorder(30, 80, 30, 80));
 
-        // Título superior de la aplicación
-        JLabel titulo = new JLabel("Sistema de Gestión de Turnos", SwingConstants.CENTER);
-        titulo.setFont(new Font("Arial", Font.BOLD, 20));
-
-        // Panel donde se ubican los botones del menú principal
-        JPanel panelBotones = new JPanel();
-        panelBotones.setLayout(new GridLayout(8, 1, 10, 10));
-        panelBotones.setBorder(BorderFactory.createEmptyBorder(20, 80, 20, 80));
-
-        // Creación de botones del sistema
-        JButton btnRegistrarPaciente = new JButton("Registrar paciente");
-        JButton btnRegistrarMedico = new JButton("Registrar médico");
-        JButton btnRegistrarEspecialidad = new JButton("Registrar especialidad");
+        // Inicialización de botones principales del sistema.
+        JButton btnEspecialidad = new JButton("Registrar especialidad");
+        JButton btnPaciente = new JButton("Registrar paciente");
+        JButton btnMedico = new JButton("Registrar médico");
         JButton btnAsignarTurno = new JButton("Asignar turno");
         JButton btnConsultarTurnos = new JButton("Consultar turnos");
-        JButton btnBuscarTurnosPorDni = new JButton("Buscar turnos por DNI");
+        JButton btnBuscarPorDni = new JButton("Buscar turnos por DNI");
         JButton btnCancelarTurno = new JButton("Cancelar turno");
+        JButton btnExportarTurnos = new JButton("Exportar turnos a TXT");
         JButton btnSalir = new JButton("Salir");
 
-        // Agregado de botones al panel del menu
-        panelBotones.add(btnRegistrarPaciente);
-        panelBotones.add(btnRegistrarMedico);
-        panelBotones.add(btnRegistrarEspecialidad);
-        panelBotones.add(btnAsignarTurno);
-        panelBotones.add(btnConsultarTurnos);
-        panelBotones.add(btnBuscarTurnosPorDni);
-        panelBotones.add(btnCancelarTurno);
-        panelBotones.add(btnSalir);
+        // Agrego los botones al panel principal.
+        panelPrincipal.add(btnEspecialidad);
+        panelPrincipal.add(btnPaciente);
+        panelPrincipal.add(btnMedico);
+        panelPrincipal.add(btnAsignarTurno);
+        panelPrincipal.add(btnConsultarTurnos);
+        panelPrincipal.add(btnBuscarPorDni);
+        panelPrincipal.add(btnCancelarTurno);
+        panelPrincipal.add(btnExportarTurnos);
+        panelPrincipal.add(btnSalir);
 
-        // Agregado del título y el panel de botones al panel principal
-        panelPrincipal.add(titulo, BorderLayout.NORTH);
-        panelPrincipal.add(panelBotones, BorderLayout.CENTER);
+        add(panelPrincipal, BorderLayout.CENTER);
 
-        // Agregado del panel principal a la ventana
-        add(panelPrincipal);
-
-        /*
-         * Eventos asociados a los botones del menú principal.
-         * Cada botón invoca un formulario o una acción específica del sistema.
-         * De esta manera se conecta la interfaz gráfica Swing con la lógica de negocio.
-         */
-
-        // Abre el formulario para registrar un nuevo paciente.
-        btnRegistrarPaciente.addActionListener(e -> mostrarFormularioPaciente());
-
-        // Abre el formulario para registrar un nuevo médico
-        btnRegistrarMedico.addActionListener(e -> mostrarFormularioMedico());
-
-        // Abre el formulario para registrar una nueva especialidad médica
-        btnRegistrarEspecialidad.addActionListener(e -> mostrarFormularioEspecialidad());
-
-        // Abre el formulario para asignar un turno a un paciente con un médico
+        // Acciones que estan asociadas a cada botón
+        btnEspecialidad.addActionListener(e -> mostrarFormularioEspecialidad());
+        btnPaciente.addActionListener(e -> mostrarFormularioPaciente());
+        btnMedico.addActionListener(e -> mostrarFormularioMedico());
         btnAsignarTurno.addActionListener(e -> mostrarFormularioAsignarTurno());
-
-        // Muestra una tabla con todos los turnos registrados
-        btnConsultarTurnos.addActionListener(e -> mostrarListadoTurnos());
-
-        // Permite buscar turnos registrados a partir del DNI del paciente
-        btnBuscarTurnosPorDni.addActionListener(e -> mostrarBusquedaTurnosPorDni());
-
-        // Permite cancelar un turno seleccionándolo desde una lista
-        btnCancelarTurno.addActionListener(e -> mostrarFormularioCancelarTurno());
-
-        // Cierra la aplicación
+        btnConsultarTurnos.addActionListener(e -> consultarTurnos());
+        btnBuscarPorDni.addActionListener(e -> buscarTurnosPorDni());
+        btnCancelarTurno.addActionListener(e -> cancelarTurno());
+        btnExportarTurnos.addActionListener(e -> exportarTurnosTxt());
         btnSalir.addActionListener(e -> System.exit(0));
     }
 
     /**
-     * Muestra un formulario modal para registrar una especialidad médica
-     * Este formulario permite cargar nombre y descripción de la especialidad
+     * Muestra el formulario para registrar una especialidad médica
      */
     private void mostrarFormularioEspecialidad() {
-
-        JDialog dialogo = new JDialog(this, "Registrar especialidad", true);
-        dialogo.setSize(400, 220);
-        dialogo.setLocationRelativeTo(this);
-        dialogo.setLayout(new BorderLayout());
-
-        // Panel del formulario con dos columnas: etiqueta y campo de texto
-        JPanel panelFormulario = new JPanel(new GridLayout(2, 2, 10, 10));
-        panelFormulario.setBorder(BorderFactory.createEmptyBorder(20, 20, 10, 20));
-
-        JLabel lblNombre = new JLabel("Nombre:");
         JTextField txtNombre = new JTextField();
-
-        JLabel lblDescripcion = new JLabel("Descripción:");
         JTextField txtDescripcion = new JTextField();
 
-        panelFormulario.add(lblNombre);
-        panelFormulario.add(txtNombre);
-        panelFormulario.add(lblDescripcion);
-        panelFormulario.add(txtDescripcion);
+        Object[] campos = {
+                "Nombre:", txtNombre,
+                "Descripción:", txtDescripcion
+        };
 
-        // Panel inferior donde se colocan los botones del formulario.
-        JPanel panelBotones = new JPanel();
-        JButton btnGuardar = new JButton("Guardar");
-        JButton btnCancelar = new JButton("Cancelar");
+        int opcion = JOptionPane.showConfirmDialog(
+                this,
+                campos,
+                "Registrar especialidad",
+                JOptionPane.OK_CANCEL_OPTION
+        );
 
-        panelBotones.add(btnGuardar);
-        panelBotones.add(btnCancelar);
-
-        dialogo.add(panelFormulario, BorderLayout.CENTER);
-        dialogo.add(panelBotones, BorderLayout.SOUTH);
-
-        /*
-         * Evento del botón Guardar.
-         * Toma los datos ingresados, llama a la lógica del sistema y maneja posibles errores mediante excepciones
-         */
-        btnGuardar.addActionListener(e -> {
+        if (opcion == JOptionPane.OK_OPTION) {
             try {
-                String nombre = txtNombre.getText();
-                String descripcion = txtDescripcion.getText();
-
-                sistema.registrarEspecialidad(nombre, descripcion);
-
-                JOptionPane.showMessageDialog(
-                        dialogo,
-                        "Especialidad registrada correctamente.",
-                        "Registro exitoso",
-                        JOptionPane.INFORMATION_MESSAGE
+                controller.registrarEspecialidad(
+                        txtNombre.getText(),
+                        txtDescripcion.getText()
                 );
 
-                dialogo.dispose();
+                JOptionPane.showMessageDialog(this, "Especialidad registrada correctamente.");
 
-            } catch (DatoInvalidoException ex) {
-                JOptionPane.showMessageDialog(
-                        dialogo,
-                        ex.getMessage(),
-                        "Dato inválido",
-                        JOptionPane.ERROR_MESSAGE
-                );
+            } catch (DatoInvalidoException | SQLException ex) {
+                mostrarError(ex.getMessage());
             }
-        });
-
-        // Cierra el formulario sin guardar los datos
-        btnCancelar.addActionListener(e -> dialogo.dispose());
-
-        dialogo.setVisible(true);
+        }
     }
 
     /**
-     * Muestra un formulario modal para registrar un paciente.
-     * Permite cargar datos básicos y valida que los campos obligatorios sean correctos.
+     * Muestra el formulario para registrar un paciente
      */
     private void mostrarFormularioPaciente() {
-
-        JDialog dialogo = new JDialog(this, "Registrar paciente", true);
-        dialogo.setSize(450, 350);
-        dialogo.setLocationRelativeTo(this);
-        dialogo.setLayout(new BorderLayout());
-
-        // Panel del formulario con etiquetas y campos de entrada
-        JPanel panelFormulario = new JPanel(new GridLayout(5, 2, 10, 10));
-        panelFormulario.setBorder(BorderFactory.createEmptyBorder(20, 20, 10, 20));
-
-        JLabel lblNombre = new JLabel("Nombre:");
         JTextField txtNombre = new JTextField();
-
-        JLabel lblApellido = new JLabel("Apellido:");
         JTextField txtApellido = new JTextField();
-
-        JLabel lblDni = new JLabel("DNI:");
         JTextField txtDni = new JTextField();
-
-        JLabel lblTelefono = new JLabel("Teléfono:");
         JTextField txtTelefono = new JTextField();
-
-        JLabel lblEmail = new JLabel("Email:");
         JTextField txtEmail = new JTextField();
 
-        panelFormulario.add(lblNombre);
-        panelFormulario.add(txtNombre);
-        panelFormulario.add(lblApellido);
-        panelFormulario.add(txtApellido);
-        panelFormulario.add(lblDni);
-        panelFormulario.add(txtDni);
-        panelFormulario.add(lblTelefono);
-        panelFormulario.add(txtTelefono);
-        panelFormulario.add(lblEmail);
-        panelFormulario.add(txtEmail);
+        Object[] campos = {
+                "Nombre:", txtNombre,
+                "Apellido:", txtApellido,
+                "DNI:", txtDni,
+                "Teléfono:", txtTelefono,
+                "Email:", txtEmail
+        };
 
-        JPanel panelBotones = new JPanel();
-        JButton btnGuardar = new JButton("Guardar");
-        JButton btnCancelar = new JButton("Cancelar");
+        int opcion = JOptionPane.showConfirmDialog(
+                this,
+                campos,
+                "Registrar paciente",
+                JOptionPane.OK_CANCEL_OPTION
+        );
 
-        panelBotones.add(btnGuardar);
-        panelBotones.add(btnCancelar);
-
-        dialogo.add(panelFormulario, BorderLayout.CENTER);
-        dialogo.add(panelBotones, BorderLayout.SOUTH);
-
-        /*
-         * Evento del botón Guardar.
-         * Convierte DNI y teléfono a enteros, y muestra mensajes de éxito o error según corresponda.
-         */
-        btnGuardar.addActionListener(e -> {
+        if (opcion == JOptionPane.OK_OPTION) {
             try {
-                String nombre = txtNombre.getText();
-                String apellido = txtApellido.getText();
                 int dni = Integer.parseInt(txtDni.getText());
                 int telefono = Integer.parseInt(txtTelefono.getText());
-                String email = txtEmail.getText();
 
-                sistema.registrarPaciente(nombre, apellido, dni, telefono, email);
-
-                JOptionPane.showMessageDialog(
-                        dialogo,
-                        "Paciente registrado correctamente.",
-                        "Registro exitoso",
-                        JOptionPane.INFORMATION_MESSAGE
+                controller.registrarPaciente(
+                        txtNombre.getText(),
+                        txtApellido.getText(),
+                        dni,
+                        telefono,
+                        txtEmail.getText()
                 );
 
-                dialogo.dispose();
+                JOptionPane.showMessageDialog(this, "Paciente registrado correctamente.");
 
             } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(
-                        dialogo,
-                        "DNI y teléfono deben ser valores numéricos.",
-                        "Dato inválido",
-                        JOptionPane.ERROR_MESSAGE
-                );
-
-            } catch (DatoInvalidoException ex) {
-                JOptionPane.showMessageDialog(
-                        dialogo,
-                        ex.getMessage(),
-                        "Dato inválido",
-                        JOptionPane.ERROR_MESSAGE
-                );
+                mostrarError("El DNI y el teléfono deben ser valores numéricos.");
+            } catch (DatoInvalidoException | SQLException ex) {
+                mostrarError(ex.getMessage());
             }
-        });
-
-        // Cierra el formulario sin guardar los datos
-        btnCancelar.addActionListener(e -> dialogo.dispose());
-
-        dialogo.setVisible(true);
+        }
     }
 
     /**
-     * Muestra un formulario para registrar un médico
-     * Para registrar un médico debe existir al menos una especialidad cargada
+     * Muestra el formulario para registrar un médico
      */
     private void mostrarFormularioMedico() {
+        try {
+            ArrayList<Especialidad> especialidades = controller.listarEspecialidades();
 
-        // Validación previa: un médico debe estar asociada a una especialidad
-        if (sistema.getEspecialidades().isEmpty()) {
-            JOptionPane.showMessageDialog(
+            if (especialidades.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Debe registrar al menos una especialidad antes de cargar el médico.");
+                return;
+            }
+
+            JTextField txtNombre = new JTextField();
+            JTextField txtApellido = new JTextField();
+            JTextField txtDni = new JTextField();
+            JTextField txtTelefono = new JTextField();
+            JTextField txtMatricula = new JTextField();
+            JComboBox<Especialidad> comboEspecialidad = new JComboBox<>();
+
+            // Cargo las especialidades existentes para asociar el médico a una de ellas
+            for (Especialidad especialidad : especialidades) {
+                comboEspecialidad.addItem(especialidad);
+            }
+
+            Object[] campos = {
+                    "Nombre:", txtNombre,
+                    "Apellido:", txtApellido,
+                    "DNI:", txtDni,
+                    "Teléfono:", txtTelefono,
+                    "Matrícula:", txtMatricula,
+                    "Especialidad:", comboEspecialidad
+            };
+
+            int opcion = JOptionPane.showConfirmDialog(
                     this,
-                    "Debe registrar al menos una especialidad antes de cargar un médico.",
-                    "Especialidad requerida",
-                    JOptionPane.WARNING_MESSAGE
+                    campos,
+                    "Registrar médico",
+                    JOptionPane.OK_CANCEL_OPTION
             );
-            return;
-        }
 
-        JDialog dialogo = new JDialog(this, "Registrar médico", true);
-        dialogo.setSize(480, 400);
-        dialogo.setLocationRelativeTo(this);
-        dialogo.setLayout(new BorderLayout());
-
-        // Panel del formulario con etiquetas y campos de entrada.
-        JPanel panelFormulario = new JPanel(new GridLayout(6, 2, 10, 10));
-        panelFormulario.setBorder(BorderFactory.createEmptyBorder(20, 20, 10, 20));
-
-        JLabel lblNombre = new JLabel("Nombre:");
-        JTextField txtNombre = new JTextField();
-
-        JLabel lblApellido = new JLabel("Apellido:");
-        JTextField txtApellido = new JTextField();
-
-        JLabel lblDni = new JLabel("DNI:");
-        JTextField txtDni = new JTextField();
-
-        JLabel lblTelefono = new JLabel("Teléfono:");
-        JTextField txtTelefono = new JTextField();
-
-        JLabel lblMatricula = new JLabel("Matrícula:");
-        JTextField txtMatricula = new JTextField();
-
-        JLabel lblEspecialidad = new JLabel("Especialidad:");
-        JComboBox<modelo.Especialidad> comboEspecialidad =
-                new JComboBox<>(sistema.getEspecialidades().toArray(new modelo.Especialidad[0]));
-
-        panelFormulario.add(lblNombre);
-        panelFormulario.add(txtNombre);
-        panelFormulario.add(lblApellido);
-        panelFormulario.add(txtApellido);
-        panelFormulario.add(lblDni);
-        panelFormulario.add(txtDni);
-        panelFormulario.add(lblTelefono);
-        panelFormulario.add(txtTelefono);
-        panelFormulario.add(lblMatricula);
-        panelFormulario.add(txtMatricula);
-        panelFormulario.add(lblEspecialidad);
-        panelFormulario.add(comboEspecialidad);
-
-        JPanel panelBotones = new JPanel();
-        JButton btnGuardar = new JButton("Guardar");
-        JButton btnCancelar = new JButton("Cancelar");
-
-        panelBotones.add(btnGuardar);
-        panelBotones.add(btnCancelar);
-
-        dialogo.add(panelFormulario, BorderLayout.CENTER);
-        dialogo.add(panelBotones, BorderLayout.SOUTH);
-
-        /*
-         * Evento del botón Guardar
-         * Convierte DNI y teléfono a enteros, obtiene la especialidad seleccionada y llama al método registrarMedico
-         */
-        btnGuardar.addActionListener(e -> {
-            try {
-                String nombre = txtNombre.getText();
-                String apellido = txtApellido.getText();
+            if (opcion == JOptionPane.OK_OPTION) {
                 int dni = Integer.parseInt(txtDni.getText());
                 int telefono = Integer.parseInt(txtTelefono.getText());
-                String matricula = txtMatricula.getText();
+                Especialidad especialidadSeleccionada = (Especialidad) comboEspecialidad.getSelectedItem();
 
-                modelo.Especialidad especialidadSeleccionada =
-                        (modelo.Especialidad) comboEspecialidad.getSelectedItem();
-
-                sistema.registrarMedico(
-                        nombre,
-                        apellido,
+                controller.registrarMedico(
+                        txtNombre.getText(),
+                        txtApellido.getText(),
                         dni,
                         telefono,
-                        matricula,
+                        txtMatricula.getText(),
                         especialidadSeleccionada
                 );
 
-                JOptionPane.showMessageDialog(
-                        dialogo,
-                        "Médico registrado correctamente.",
-                        "Registro exitoso",
-                        JOptionPane.INFORMATION_MESSAGE
-                );
-
-                dialogo.dispose();
-
-            } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(
-                        dialogo,
-                        "DNI y teléfono deben ser valores numéricos.",
-                        "Dato inválido",
-                        JOptionPane.ERROR_MESSAGE
-                );
-
-            } catch (DatoInvalidoException ex) {
-                JOptionPane.showMessageDialog(
-                        dialogo,
-                        ex.getMessage(),
-                        "Dato inválido",
-                        JOptionPane.ERROR_MESSAGE
-                );
+                JOptionPane.showMessageDialog(this, "Médico registrado correctamente.");
             }
-        });
 
-        // Cierra el formulario sin guardar datos
-        btnCancelar.addActionListener(e -> dialogo.dispose());
-
-        dialogo.setVisible(true);
+        } catch (NumberFormatException ex) {
+            mostrarError("El DNI y el teléfono deben ser valores numéricos.");
+        } catch (DatoInvalidoException | SQLException ex) {
+            mostrarError(ex.getMessage());
+        }
     }
 
     /**
-     * Muestra un formulario para asignar un turno médico
-     * El turno requiere seleccionar paciente, médico, fecha, hora y una observación opcional
+     * Muestra el formulario para asignar un turno
      */
     private void mostrarFormularioAsignarTurno() {
+        try {
+            ArrayList<Paciente> pacientes = controller.listarPacientes();
+            ArrayList<Medico> medicos = controller.listarMedicos();
 
-        // Validación previa: para asignar un turno deben existir pacientes y médicos registrados.
-        if (sistema.getPacientes().isEmpty()) {
-            JOptionPane.showMessageDialog(
+            if (pacientes.isEmpty() || medicos.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Debe existir al menos un paciente y un médico para asignar un turno.");
+                return;
+            }
+
+            JComboBox<Paciente> comboPaciente = new JComboBox<>();
+            JComboBox<Medico> comboMedico = new JComboBox<>();
+
+            // Cargo pacientes y médicos desde la base de datos
+            for (Paciente paciente : pacientes) {
+                comboPaciente.addItem(paciente);
+            }
+
+            for (Medico medico : medicos) {
+                comboMedico.addItem(medico);
+            }
+
+            // Se propone la fecha y hora sugeridas por el sistema
+            JTextField txtFecha = new JTextField(obtenerFechaSugeridaTexto());
+            JTextField txtHora = new JTextField(obtenerHoraSugeridaTexto());
+            JTextField txtObservacion = new JTextField();
+
+            Object[] campos = {
+                    "Paciente:", comboPaciente,
+                    "Médico:", comboMedico,
+                    "Fecha (AAAA-MM-DD):", txtFecha,
+                    "Hora (HH:MM):", txtHora,
+                    "Observación:", txtObservacion
+            };
+
+            int opcion = JOptionPane.showConfirmDialog(
                     this,
-                    "Debe registrar al menos un paciente antes de asignar un turno.",
-                    "Paciente requerido",
-                    JOptionPane.WARNING_MESSAGE
+                    campos,
+                    "Asignar turno",
+                    JOptionPane.OK_CANCEL_OPTION
             );
-            return;
-        }
 
-        if (sistema.getMedicos().isEmpty()) {
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Debe registrar al menos un médico antes de asignar un turno.",
-                    "Médico requerido",
-                    JOptionPane.WARNING_MESSAGE
-            );
-            return;
-        }
+            if (opcion == JOptionPane.OK_OPTION) {
+                Paciente pacienteSeleccionado = (Paciente) comboPaciente.getSelectedItem();
+                Medico medicoSeleccionado = (Medico) comboMedico.getSelectedItem();
 
-        JDialog dialogo = new JDialog(this, "Asignar turno", true);
-        dialogo.setSize(500, 380);
-        dialogo.setLocationRelativeTo(this);
-        dialogo.setLayout(new BorderLayout());
-
-        // Panel del formulario
-        JPanel panelFormulario = new JPanel(new GridLayout(5, 2, 10, 10));
-        panelFormulario.setBorder(BorderFactory.createEmptyBorder(20, 20, 10, 20));
-
-        JLabel lblPaciente = new JLabel("Paciente:");
-        JComboBox<modelo.Paciente> comboPaciente =
-                new JComboBox<>(sistema.getPacientes().toArray(new modelo.Paciente[0]));
-
-        JLabel lblMedico = new JLabel("Médico:");
-        JComboBox<modelo.Medico> comboMedico =
-                new JComboBox<>(sistema.getMedicos().toArray(new modelo.Medico[0]));
-
-        JLabel lblFecha = new JLabel("Fecha (AAAA-MM-DD):");
-        JTextField txtFecha = new JTextField();
-
-        JLabel lblHora = new JLabel("Hora (HH:MM):");
-        JTextField txtHora = new JTextField();
-
-        JLabel lblObservacion = new JLabel("Observación:");
-        JTextField txtObservacion = new JTextField();
-
-        panelFormulario.add(lblPaciente);
-        panelFormulario.add(comboPaciente);
-        panelFormulario.add(lblMedico);
-        panelFormulario.add(comboMedico);
-        panelFormulario.add(lblFecha);
-        panelFormulario.add(txtFecha);
-        panelFormulario.add(lblHora);
-        panelFormulario.add(txtHora);
-        panelFormulario.add(lblObservacion);
-        panelFormulario.add(txtObservacion);
-
-        JPanel panelBotones = new JPanel();
-        JButton btnGuardar = new JButton("Guardar");
-        JButton btnCancelar = new JButton("Cancelar");
-
-        panelBotones.add(btnGuardar);
-        panelBotones.add(btnCancelar);
-
-        dialogo.add(panelFormulario, BorderLayout.CENTER);
-        dialogo.add(panelBotones, BorderLayout.SOUTH);
-
-        /*
-         * Evento del botón Guardar
-         * Convierte fecha y hora al formato correspondiente, verifica disponibilidad y registra el turno si no existe superposición.
-         */
-        btnGuardar.addActionListener(e -> {
-            try {
-                modelo.Paciente pacienteSeleccionado =
-                        (modelo.Paciente) comboPaciente.getSelectedItem();
-
-                modelo.Medico medicoSeleccionado =
-                        (modelo.Medico) comboMedico.getSelectedItem();
-
+                // Convierto la fecha ingresada a LocalDate.
                 LocalDate fecha = LocalDate.parse(txtFecha.getText());
-                LocalTime hora = LocalTime.parse(txtHora.getText());
-                String observacion = txtObservacion.getText();
 
-                sistema.asignarTurno(
+                // Convierto la hora ingresada a LocalTime.
+                LocalTime hora = LocalTime.parse(txtHora.getText());
+
+                // Actualizo fecha y hora sugeridas para reutilizarlas en próximas operaciones
+                actualizarFechaSugerida(fecha);
+                actualizarHoraSugerida(hora);
+
+                controller.asignarTurno(
                         pacienteSeleccionado,
                         medicoSeleccionado,
                         fecha,
                         hora,
-                        observacion,
-                        sistema.getUsuarioAdministrador()
+                        txtObservacion.getText()
                 );
 
-                JOptionPane.showMessageDialog(
-                        dialogo,
-                        "Turno asignado correctamente.",
-                        "Registro exitoso",
-                        JOptionPane.INFORMATION_MESSAGE
-                );
-
-                dialogo.dispose();
-
-            } catch (DateTimeParseException ex) {
-                JOptionPane.showMessageDialog(
-                        dialogo,
-                        "La fecha debe tener formato AAAA-MM-DD y la hora formato HH:MM.",
-                        "Formato inválido",
-                        JOptionPane.ERROR_MESSAGE
-                );
-
-            } catch (DatoInvalidoException | TurnoNoDisponibleException ex) {
-                JOptionPane.showMessageDialog(
-                        dialogo,
-                        ex.getMessage(),
-                        "No se pudo asignar el turno",
-                        JOptionPane.ERROR_MESSAGE
-                );
+                JOptionPane.showMessageDialog(this, "Turno registrado correctamente.");
             }
-        });
 
-        // Cierra el formulario sin guardar datos
-        btnCancelar.addActionListener(e -> dialogo.dispose());
-
-        dialogo.setVisible(true);
+        } catch (DatoInvalidoException | TurnoNoDisponibleException | SQLException ex) {
+            mostrarError(ex.getMessage());
+        } catch (Exception ex) {
+            mostrarError("La fecha debe tener formato AAAA-MM-DD y la hora formato HH:MM.");
+        }
     }
 
     /**
-     * Muestra una ventana con el listado completo de turnos registrados
-     * Antes de mostrar la información, ordena los turnos por fecha y hora
+     * Consulto turnos. Al ingresar, el usuario puede elegir entre:
+     * 1. Ver todos los turnos registrados.
+     * 2. Ver turnos de una fecha determinada.
+     * 3. Ver turnos activos por especialidad y fecha.
      */
-    private void mostrarListadoTurnos() {
+    private void consultarTurnos() {
 
-        if (sistema.getTurnos().isEmpty()) {
-            JOptionPane.showMessageDialog(
-                    this,
-                    "No hay turnos registrados.",
-                    "Consulta de turnos",
-                    JOptionPane.INFORMATION_MESSAGE
-            );
+        // Opciones que se muestran al usuario al presionar el botón "Consultar turnos".
+        String[] opciones = {
+                "Ver todos los turnos registrados",
+                "Ver turnos por fecha",
+                "Ver turnos activos por especialidad y fecha"
+        };
+
+        // Muestro un cuadro de diálogo para seleccionar el tipo de consulta
+        String seleccion = (String) JOptionPane.showInputDialog(
+                this,
+                "Seleccione el tipo de consulta que desea realizar:",
+                "Consultar turnos",
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                opciones,
+                opciones[0]
+        );
+
+        // Si el usuario cancela el cuadro, no se realiza ninguna acción
+        if (seleccion == null) {
             return;
         }
 
-        // Ordena turnos por fecha y hora antes de mostrarlos
-        sistema.ordenarTurnosPorFechaYHora();
+        // Según la opción elegida, se llama al método específico
+        switch (seleccion) {
+            case "Ver todos los turnos registrados":
+                consultarTodosLosTurnos();
+                break;
 
-        mostrarTablaTurnos(sistema.getTurnos(), "Consultar turnos");
+            case "Ver turnos por fecha":
+                consultarTurnosPorFecha();
+                break;
+
+            case "Ver turnos activos por especialidad y fecha":
+                consultarTurnosPorEspecialidadYFecha();
+                break;
+        }
     }
 
     /**
-     * Muestra una lista de turnos en una tabla.
-     * Este metodo permite reutilizar la visualización tanto para consultar todos los turnos como para mostrar resultados de búsqueda.
+     * Consulta todos los turnos registrados en base de datos.
+     * Esta opción muestra la consulta general, incluyendo turnos reservados, cancelados o atendidos.
      */
-    private void mostrarTablaTurnos(ArrayList<Turno> listaTurnos, String tituloVentana) {
+    private void consultarTodosLosTurnos() {
+        try {
+            ArrayList<Turno> turnos = controller.listarTurnos();
 
-        JDialog dialogo = new JDialog(this, tituloVentana, true);
-        dialogo.setSize(850, 400);
-        dialogo.setLocationRelativeTo(this);
-        dialogo.setLayout(new BorderLayout());
+            mostrarTablaTurnos(turnos, "Consulta general de turnos");
 
+        } catch (SQLException ex) {
+            mostrarError("Error al consultar la base de datos: " + ex.getMessage());
+        }
+    }
+
+    /**
+     * Consulta los turnos registrados en una fecha determinada.
+     * Esta opción permite visualizar la agenda completa de un día, manteniendo visible el estado de cada turno
+     */
+    private void consultarTurnosPorFecha() {
+
+        String fechaTexto = JOptionPane.showInputDialog(
+                this,
+                "Ingrese la fecha a consultar (AAAA-MM-DD):",
+                obtenerFechaSugeridaTexto()
+        );
+
+        if (fechaTexto == null || fechaTexto.trim().isEmpty()) {
+            return;
+        }
+
+        try {
+            // Conversión del texto ingresado a LocalDate.
+            LocalDate fecha = LocalDate.parse(fechaTexto);
+
+            // Guardo la fecha consultada para proponerla en otros formularios.
+            actualizarFechaSugerida(fecha);
+
+            ArrayList<Turno> turnos = controller.listarTurnosPorFecha(fecha);
+
+            if (turnos.isEmpty()) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "No se encontraron turnos registrados para la fecha ingresada."
+                );
+            } else {
+                mostrarTablaTurnos(turnos, "Turnos registrados el día " + fecha);
+            }
+
+        } catch (DatoInvalidoException ex) {
+            mostrarError(ex.getMessage());
+
+        } catch (SQLException ex) {
+            mostrarError("Error al consultar la base de datos: " + ex.getMessage());
+
+        } catch (Exception ex) {
+            mostrarError("La fecha debe tener formato AAAA-MM-DD.");
+        }
+    }
+
+    /**
+     * Consulta turnos activos filtrados por especialidad médica y fecha
+     */
+    private void consultarTurnosPorEspecialidadYFecha() {
+        try {
+            ArrayList<Especialidad> especialidades = controller.listarEspecialidades();
+
+            if (especialidades.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Debe existir al menos una especialidad registrada.");
+                return;
+            }
+
+            JComboBox<Especialidad> comboEspecialidad = new JComboBox<>();
+
+            // Cargo las especialidades dentro del ComboBox.
+            for (Especialidad especialidad : especialidades) {
+                comboEspecialidad.addItem(especialidad);
+            }
+
+            // Fecha sugerida por el sistema.
+            JTextField txtFecha = new JTextField(obtenerFechaSugeridaTexto());
+
+            Object[] campos = {
+                    "Especialidad:", comboEspecialidad,
+                    "Fecha (AAAA-MM-DD):", txtFecha
+            };
+
+            int opcion = JOptionPane.showConfirmDialog(
+                    this,
+                    campos,
+                    "Consultar turnos por especialidad y fecha",
+                    JOptionPane.OK_CANCEL_OPTION
+            );
+
+            if (opcion == JOptionPane.OK_OPTION) {
+                Especialidad especialidadSeleccionada = (Especialidad) comboEspecialidad.getSelectedItem();
+
+                // Se convierte la fecha ingresada a LocalDate.
+                LocalDate fecha = LocalDate.parse(txtFecha.getText());
+
+                // Actualizo la fecha sugerida para próximas consultas o exportaciones.
+                actualizarFechaSugerida(fecha);
+
+                ArrayList<Turno> turnos = controller.listarTurnosPorEspecialidadYFecha(
+                        especialidadSeleccionada,
+                        fecha
+                );
+
+                if (turnos.isEmpty()) {
+                    JOptionPane.showMessageDialog(
+                            this,
+                            "No se encontraron turnos activos para la especialidad y fecha seleccionadas."
+                    );
+                } else {
+                    mostrarTablaTurnos(turnos, "Turnos activos por especialidad y fecha");
+                }
+            }
+
+        } catch (DatoInvalidoException ex) {
+            mostrarError(ex.getMessage());
+
+        } catch (SQLException ex) {
+            mostrarError("Error al consultar la base de datos: " + ex.getMessage());
+
+        } catch (Exception ex) {
+            mostrarError("La fecha debe tener formato AAAA-MM-DD.");
+        }
+    }
+    /**
+     * Obtiene los turnos activos disponibles para cancelar.
+     * Permite elegir si se muestran todos los turnos activos, si se busca por DNI o si se busca por nombre/apellido del paciente.
+     */
+    private ArrayList<Turno> obtenerTurnosActivosParaCancelar() throws SQLException {
+
+        String[] opciones = {
+                "Ver todos los turnos activos",
+                "Buscar por DNI del paciente",
+                "Buscar por nombre o apellido del paciente"
+        };
+
+        String seleccion = (String) JOptionPane.showInputDialog(
+                this,
+                "Seleccione cómo desea buscar el turno a cancelar:",
+                "Buscar turno para cancelar",
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                opciones,
+                opciones[0]
+        );
+
+        if (seleccion == null) {
+            return null;
+        }
+
+        ArrayList<Turno> turnos;
+
+        switch (seleccion) {
+            case "Buscar por DNI del paciente":
+                String dniTexto = JOptionPane.showInputDialog(this, "Ingrese el DNI del paciente:");
+
+                if (dniTexto == null || dniTexto.trim().isEmpty()) {
+                    return null;
+                }
+
+                try {
+                    int dni = Integer.parseInt(dniTexto);
+                    turnos = controller.buscarTurnosPorDni(dni);
+                } catch (NumberFormatException ex) {
+                    mostrarError("El DNI debe ser numérico.");
+                    return null;
+                }
+                break;
+
+            case "Buscar por nombre o apellido del paciente":
+                String textoBusqueda = JOptionPane.showInputDialog(
+                        this,
+                        "Ingrese nombre o apellido del paciente:"
+                );
+
+                if (textoBusqueda == null || textoBusqueda.trim().isEmpty()) {
+                    return null;
+                }
+
+                turnos = filtrarTurnosPorNombreOApellido(
+                        controller.listarTurnos(),
+                        textoBusqueda
+                );
+                break;
+
+            default:
+                turnos = controller.listarTurnos();
+                break;
+        }
+
+        return filtrarTurnosActivos(turnos);
+    }
+    /**
+     * Filtra una lista de turnos dejando solamente aquellos que no están cancelados.
+     */
+    private ArrayList<Turno> filtrarTurnosActivos(ArrayList<Turno> turnos) {
+        ArrayList<Turno> turnosActivos = new ArrayList<>();
+
+        for (Turno turno : turnos) {
+            if (!turno.getEstadoTurno().getEstado().equalsIgnoreCase("Cancelado")) {
+                turnosActivos.add(turno);
+            }
+        }
+
+        return turnosActivos;
+    }
+    /**
+     * Filtra turnos por nombre o apellido del paciente.
+     * La búsqueda no distingue entre mayúsculas y minúsculas.
+     */
+    private ArrayList<Turno> filtrarTurnosPorNombreOApellido(ArrayList<Turno> turnos, String textoBusqueda) {
+        ArrayList<Turno> resultado = new ArrayList<>();
+
+        String texto = textoBusqueda.toLowerCase().trim();
+
+        for (Turno turno : turnos) {
+            String nombrePaciente = turno.getPaciente().getNombre().toLowerCase();
+            String apellidoPaciente = turno.getPaciente().getApellido().toLowerCase();
+            String nombreCompleto = turno.getPaciente().getNombreCompleto().toLowerCase();
+
+            if (nombrePaciente.contains(texto)
+                    || apellidoPaciente.contains(texto)
+                    || nombreCompleto.contains(texto)) {
+                resultado.add(turno);
+            }
+        }
+
+        return resultado;
+    }
+
+    /**
+     * Busca turnos por DNI del paciente.
+     */
+    private void buscarTurnosPorDni() {
+        String dniTexto = JOptionPane.showInputDialog(this, "Ingrese el DNI del paciente:");
+
+        if (dniTexto == null || dniTexto.trim().isEmpty()) {
+            return;
+        }
+
+        try {
+            int dni = Integer.parseInt(dniTexto);
+            ArrayList<Turno> turnos = controller.buscarTurnosPorDni(dni);
+
+            if (turnos.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "No se encontraron turnos para el DNI ingresado.");
+            } else {
+                mostrarTablaTurnos(turnos, "Turnos encontrados por DNI");
+            }
+
+        } catch (NumberFormatException ex) {
+            mostrarError("El DNI debe ser numérico.");
+        } catch (SQLException ex) {
+            mostrarError(ex.getMessage());
+        }
+    }
+
+    /**
+     * Cancela un turno activo modificando su estado en MySQL.
+     * Antes de mostrar los turnos permite filtrar por DNI, nombre o apellido del paciente.
+     */
+    private void cancelarTurno() {
+        try {
+            ArrayList<Turno> turnosParaCancelar = obtenerTurnosActivosParaCancelar();
+
+            if (turnosParaCancelar == null) {
+                return;
+            }
+
+            if (turnosParaCancelar.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "No se encontraron turnos activos para cancelar.");
+                return;
+            }
+
+            JComboBox<Turno> comboTurnos = new JComboBox<>();
+
+            // Cargo en el combo solo los turnos activos encontrados según el filtro aplicado.
+            for (Turno turno : turnosParaCancelar) {
+                comboTurnos.addItem(turno);
+            }
+
+            Object[] campos = {
+                    "Seleccione el turno a cancelar:", comboTurnos
+            };
+
+            int opcion = JOptionPane.showConfirmDialog(
+                    this,
+                    campos,
+                    "Cancelar turno",
+                    JOptionPane.OK_CANCEL_OPTION
+            );
+
+            if (opcion == JOptionPane.OK_OPTION) {
+                Turno turnoSeleccionado = (Turno) comboTurnos.getSelectedItem();
+
+                if (turnoSeleccionado == null) {
+                    return;
+                }
+
+                int confirmar = JOptionPane.showConfirmDialog(
+                        this,
+                        "¿Confirma la cancelación del turno seleccionado?\n\n" +
+                                "Paciente: " + turnoSeleccionado.getPaciente().getNombreCompleto() + "\n" +
+                                "DNI: " + turnoSeleccionado.getPaciente().getDni() + "\n" +
+                                "Fecha: " + turnoSeleccionado.getFecha() + "\n" +
+                                "Hora: " + turnoSeleccionado.getHora(),
+                        "Confirmar cancelación",
+                        JOptionPane.YES_NO_OPTION
+                );
+
+                if (confirmar == JOptionPane.YES_OPTION) {
+                    controller.cancelarTurno(turnoSeleccionado.getIdTurno());
+                    JOptionPane.showMessageDialog(this, "Turno cancelado correctamente.");
+
+                    // Luego de cancelar, muestro nuevamente la tabla con todos los turnos para verificar el cambio de estado.
+                    mostrarTablaTurnos(controller.listarTurnos(), "Turnos actualizados");
+                }
+            }
+
+        } catch (SQLException ex) {
+            mostrarError("Error al consultar la base de datos: " + ex.getMessage());
+        }
+    }
+
+    /**
+     * Exportación de turnos activos por especialidad y fecha a un archivo TXT.
+     */
+    private void exportarTurnosTxt() {
+        try {
+            ArrayList<Especialidad> especialidades = controller.listarEspecialidades();
+
+            if (especialidades.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Debe existir al menos una especialidad registrada.");
+                return;
+            }
+
+            JComboBox<Especialidad> comboEspecialidad = new JComboBox<>();
+
+            // Cargo las especialidades para que el usuario elija cuál exportar.
+            for (Especialidad especialidad : especialidades) {
+                comboEspecialidad.addItem(especialidad);
+            }
+
+            // Se propone la última fecha consultada o la fecha actual si no se consultó otra fecha.
+            JTextField txtFecha = new JTextField(obtenerFechaSugeridaTexto());
+
+            Object[] campos = {
+                    "Especialidad:", comboEspecialidad,
+                    "Fecha (AAAA-MM-DD):", txtFecha
+            };
+
+            int opcion = JOptionPane.showConfirmDialog(
+                    this,
+                    campos,
+                    "Exportar turnos a TXT",
+                    JOptionPane.OK_CANCEL_OPTION
+            );
+
+            if (opcion == JOptionPane.OK_OPTION) {
+                Especialidad especialidadSeleccionada = (Especialidad) comboEspecialidad.getSelectedItem();
+
+                // Convierto la fecha ingresada a LocalDate.
+                LocalDate fecha = LocalDate.parse(txtFecha.getText());
+
+                // Guardo la fecha utilizada para mantener coherencia entre consulta y exportación.
+                actualizarFechaSugerida(fecha);
+
+                String rutaArchivo = controller.exportarTurnosPorEspecialidadYFecha(
+                        especialidadSeleccionada,
+                        fecha
+                );
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Archivo generado correctamente:\n" + rutaArchivo
+                );
+            }
+
+        } catch (DatoInvalidoException ex) {
+            mostrarError(ex.getMessage());
+
+        } catch (SQLException ex) {
+            mostrarError("Error al consultar la base de datos: " + ex.getMessage());
+
+        } catch (Exception ex) {
+            mostrarError("La fecha debe tener formato AAAA-MM-DD.");
+        }
+    }
+
+    /**
+     * Muestra una lista de turnos en una tabla Swing
+     * Incluye el DNI del paciente para facilidad de control y cancelación de turnos si fuera necesario.
+     */
+    private void mostrarTablaTurnos(ArrayList<Turno> turnos, String titulo) {
         String[] columnas = {
                 "ID",
                 "Fecha",
                 "Hora",
                 "Paciente",
+                "DNI Paciente",
                 "Médico",
+                "Especialidad",
                 "Estado",
                 "Observación"
         };
 
-        /*
-         * DefaultTableModel permite cargar datos en una JTable (filas y col.)
-         * Se sobrescribe isCellEditable para evitar que el usuario edite la tabla directamente
-         */
-        DefaultTableModel modeloTabla = new DefaultTableModel(columnas, 0) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-        };
+        DefaultTableModel modeloTabla = new DefaultTableModel(columnas, 0);
 
-        // Recorro lista recibida y agrega cada turno como una fila de la tabla.
-        for (Turno turno : listaTurnos) {
+        // Cada turno se convierte en una fila de la tabla.
+        for (Turno turno : turnos) {
             Object[] fila = {
                     turno.getIdTurno(),
                     turno.getFecha(),
                     turno.getHora(),
                     turno.getPaciente().getNombreCompleto(),
+                    turno.getPaciente().getDni(),
                     turno.getMedico().getNombreCompleto(),
+                    turno.getMedico().getEspecialidad().getNombre(),
                     turno.getEstadoTurno().getEstado(),
                     turno.getObservacion()
             };
@@ -612,156 +795,61 @@ public class VentanaPrincipal extends JFrame {
             modeloTabla.addRow(fila);
         }
 
-        JTable tablaTurnos = new JTable(modeloTabla);
-        JScrollPane scrollPane = new JScrollPane(tablaTurnos);
+        JTable tabla = new JTable(modeloTabla);
+        JScrollPane scrollPane = new JScrollPane(tabla);
 
-        JButton btnCerrar = new JButton("Cerrar");
-        btnCerrar.addActionListener(e -> dialogo.dispose());
-
-        JPanel panelBoton = new JPanel();
-        panelBoton.add(btnCerrar);
-
-        dialogo.add(scrollPane, BorderLayout.CENTER);
-        dialogo.add(panelBoton, BorderLayout.SOUTH);
-
+        JDialog dialogo = new JDialog(this, titulo, true);
+        dialogo.setSize(1000, 400);
+        dialogo.setLocationRelativeTo(this);
+        dialogo.add(scrollPane);
         dialogo.setVisible(true);
     }
 
     /**
-     * Permite buscar turnos asociados a un paciente mediante su DNI
-     * El resultado se muestra en una tabla, reutilizando la lista de turnos del sistema
+     * Muestra mensajes de error controlados.
      */
-    private void mostrarBusquedaTurnosPorDni() {
-
-        if (sistema.getTurnos().isEmpty()) {
-            JOptionPane.showMessageDialog(
-                    this,
-                    "No hay turnos registrados para buscar.",
-                    "Buscar turnos",
-                    JOptionPane.INFORMATION_MESSAGE
-            );
-            return;
-        }
-
-        String dniIngresado = JOptionPane.showInputDialog(
+    private void mostrarError(String mensaje) {
+        JOptionPane.showMessageDialog(
                 this,
-                "Ingrese el DNI del paciente:",
-                "Buscar turnos por DNI",
-                JOptionPane.QUESTION_MESSAGE
+                mensaje,
+                "Error",
+                JOptionPane.ERROR_MESSAGE
         );
+    }
 
-        // Si el usuario cancela o cierra la ventana, no se realiza ninguna acción
-        if (dniIngresado == null) {
-            return;
-        }
+    /**
+     * Devuelve la fecha sugerida en formato de texto.
+     * Se utiliza para completar los campos de fecha en formularios de asignación, consulta y exportación
+     */
+    private String obtenerFechaSugeridaTexto() {
+        return fechaSugerida.toString();
+    }
 
-        try {
-            int dni = Integer.parseInt(dniIngresado.trim());
+    /**
+     * Devuelve la hora sugerida en formato de texto.
+     * Se utiliza para completar el campo de hora al asignar un turno
+     */
+    private String obtenerHoraSugeridaTexto() {
+        return horaSugerida.toString();
+    }
 
-            /*
-             * Se llama al metodo de búsqueda definido en SistemaTurnos.
-             * Este metodo recorre la lista de turnos y devuelve aquellos que correspondan al DNI ingresado.
-             */
-            ArrayList<Turno> turnosEncontrados = sistema.buscarTurnosPorDniPaciente(dni);
-
-            if (turnosEncontrados.isEmpty()) {
-                JOptionPane.showMessageDialog(
-                        this,
-                        "No se encontraron turnos para el DNI ingresado.",
-                        "Sin resultados",
-                        JOptionPane.INFORMATION_MESSAGE
-                );
-                return;
-            }
-
-            mostrarTablaTurnos(turnosEncontrados, "Turnos encontrados para DNI: " + dni);
-
-        } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(
-                    this,
-                    "El DNI debe ser un valor numérico.",
-                    "Dato inválido",
-                    JOptionPane.ERROR_MESSAGE
-            );
+    /**
+     * Actualiza la fecha sugerida del sistema, permitiendo que si el usuario consulta una fecha determinada,
+     * esa misma fecha se proponga luego en otros formularios.
+     */
+    private void actualizarFechaSugerida(LocalDate fecha) {
+        if (fecha != null) {
+            fechaSugerida = fecha;
         }
     }
 
     /**
-     * Permite cancelar un turno registrado seleccionándolo desde una lista desplegable
-     * Se muestran únicamente los turnos activos, evitando cancelar nuevamente turnos ya cancelados
+     * Actualiza la hora sugerida del sistema.
+     * Esto permite que, si el usuario asigna un turno en determinado horario, ese horario quede propuesto en la próxima asignación.
      */
-    private void mostrarFormularioCancelarTurno() {
-
-        if (sistema.getTurnos().isEmpty()) {
-            JOptionPane.showMessageDialog(
-                    this,
-                    "No hay turnos registrados para cancelar.",
-                    "Cancelar turno",
-                    JOptionPane.WARNING_MESSAGE
-            );
-            return;
-        }
-
-        // ComboBox que contiene únicamente los turnos que NO estén cancelados
-        JComboBox<Turno> comboTurnos = new JComboBox<>();
-
-        for (Turno turno : sistema.getTurnos()) {
-            boolean estaCancelado = turno.getEstadoTurno().getEstado().equalsIgnoreCase("Cancelado");
-
-            if (!estaCancelado) {
-                comboTurnos.addItem(turno);
-            }
-        }
-
-        if (comboTurnos.getItemCount() == 0) {
-            JOptionPane.showMessageDialog(
-                    this,
-                    "No hay turnos activos para cancelar.",
-                    "Cancelar turno",
-                    JOptionPane.INFORMATION_MESSAGE
-            );
-            return;
-        }
-
-        JPanel panel = new JPanel(new BorderLayout(10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-
-        JLabel lblSeleccion = new JLabel("Seleccione el turno que desea cancelar:");
-
-        panel.add(lblSeleccion, BorderLayout.NORTH);
-        panel.add(comboTurnos, BorderLayout.CENTER);
-
-        int opcion = JOptionPane.showConfirmDialog(
-                this,
-                panel,
-                "Cancelar turno",
-                JOptionPane.OK_CANCEL_OPTION,
-                JOptionPane.QUESTION_MESSAGE
-        );
-
-        if (opcion == JOptionPane.OK_OPTION) {
-            try {
-                Turno turnoSeleccionado = (Turno) comboTurnos.getSelectedItem();
-
-                if (turnoSeleccionado != null) {
-                    sistema.cancelarTurno(turnoSeleccionado.getIdTurno());
-
-                    JOptionPane.showMessageDialog(
-                            this,
-                            "Turno cancelado correctamente.",
-                            "Cancelación exitosa",
-                            JOptionPane.INFORMATION_MESSAGE
-                    );
-                }
-
-            } catch (RegistroNoEncontradoException ex) {
-                JOptionPane.showMessageDialog(
-                        this,
-                        ex.getMessage(),
-                        "Turno no encontrado",
-                        JOptionPane.ERROR_MESSAGE
-                );
-            }
+    private void actualizarHoraSugerida(LocalTime hora) {
+        if (hora != null) {
+            horaSugerida = hora;
         }
     }
 }
