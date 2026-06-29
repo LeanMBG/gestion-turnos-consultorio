@@ -1,45 +1,25 @@
-<!--
-    Archivo pom.xml
-    Este archivo pertenece a Maven y permite configurar el proyecto Java.
-    En este caso se utiliza principalmente para indicar la versión de Java
-    y declarar la dependencia necesaria para conectar Java con MySQL.
--->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-    <!-- Versión del modelo de Maven. Se mantiene siempre en 4.0.0 para proyectos actuales. -->
+    <!-- Archivo de configuración Maven del proyecto -->
     <modelVersion>4.0.0</modelVersion>
 
-    <!-- Identificador del grupo o institución/proyecto. -->
-    <groupId>ar.edu.siglo21</groupId>
-
-    <!-- Nombre identificador del proyecto. -->
+    <groupId>ar.leandrobarbera</groupId>
     <artifactId>gestion-turnos-consultorio</artifactId>
-
-    <!-- Versión del proyecto. SNAPSHOT indica que es una versión en desarrollo. -->
     <version>1.0-SNAPSHOT</version>
 
-    <!-- Propiedades generales del proyecto. -->
+    <!-- Configuración de Java -->
     <properties>
-        <!-- Versión de Java utilizada para compilar el proyecto. -->
         <maven.compiler.source>21</maven.compiler.source>
-
-        <!-- Versión de Java objetivo para generar los archivos compilados. -->
         <maven.compiler.target>21</maven.compiler.target>
-
-        <!-- Codificación de caracteres utilizada por el proyecto. -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <!-- Dependencias externas que necesita el proyecto para funcionar. -->
+    <!-- Dependencias necesarias para el proyecto -->
     <dependencies>
 
-        <!--
-            MySQL Connector/J
-            Es el driver JDBC oficial que permite conectar una aplicación Java
-            con una base de datos MySQL.
-        -->
+        <!-- Driver JDBC para conectar Java con MySQL -->
         <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
@@ -48,12 +28,8 @@
 
     </dependencies>
 
-    <!-- Configuración de compilación del proyecto. -->
+    <!-- Indico que el código fuente se encuentra dentro de la carpeta src -->
     <build>
-        <!--
-            Se indica que el código fuente Java se encuentra directamente
-            dentro de la carpeta src.
-        -->
         <sourceDirectory>src</sourceDirectory>
     </build>
 
